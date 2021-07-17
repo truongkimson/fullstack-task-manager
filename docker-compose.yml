@@ -2,7 +2,7 @@ version: "3.9"
 services:
     db:
         image: mysql:8.0
-        environment: 
+        environment:
             - MYSQL_ROOT_PASSWORD=password
             - MYSQL_DATABASE=task-db
             - MYSQL_USER=task-service
@@ -18,7 +18,7 @@ services:
         restart: always
         links:
             - db
-        depends_on: 
+        depends_on:
             - "db"
         container_name: task-service
     client:
