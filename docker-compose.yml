@@ -21,14 +21,14 @@ services:
         depends_on:
             - "db"
         container_name: task-service
-    client:
-        image: task-manager-client:1.0
-        build: ./task-manager-client
-        ports:
-            - "80:80"
-        restart: always
-        depends_on:
-            - "web"
-        container_name: task-client
+    # client:
+    #     image: task-manager-client:1.0
+    #     build: ./task-manager-client
+    #     ports:
+    #         - "80:80"
+    #     restart: always
+    #     depends_on:
+    #         - "web"
+    #     container_name: task-client
 volumes:
     db-data:
