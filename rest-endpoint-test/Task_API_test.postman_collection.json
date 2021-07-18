@@ -1,0 +1,681 @@
+{
+	"info": {
+		"_postman_id": "9085628d-cc90-4a8e-ba86-339e79ac0e62",
+		"name": "Task API test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET Initial fetch all test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"should receive status code 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"})\r",
+							"\r",
+							"postman.setNextRequest(\"POST Create a new Task - Illgegal fields\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}:{{port}}/api/v1/task/all",
+					"host": [
+						"{{base_url}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"v1",
+						"task",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Fetch after create new task",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const createdId = pm.collectionVariables.get(\"createTaskId\");\r",
+							"const createdDesc = pm.collectionVariables.get(\"createTaskDesc\");\r",
+							"const createdDate = pm.collectionVariables.get(\"createTaskDate\");\r",
+							"\r",
+							"pm.test(\"should receive status code 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"})\r",
+							"\r",
+							"const createdTask = pm.response.json().find(task => task.id === parseInt(createdId)\r",
+							"&& task.description === createdDesc\r",
+							"&& task.date === createdDate);\r",
+							"\r",
+							"pm.test(\"should fetch newly created task\", () => {\r",
+							"   \r",
+							"    pm.expect(createdTask).to.be.an('object');\r",
+							"})\r",
+							"\r",
+							"postman.setNextRequest(\"PUT Update Task - Illegal fields\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}:{{port}}/api/v1/task/all",
+					"host": [
+						"{{base_url}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"v1",
+						"task",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Fetch after update task",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const updatedDesc = pm.collectionVariables.get(\"updateTaskDesc\");\r",
+							"const updatedDate = pm.collectionVariables.get(\"updateTaskDate\");\r",
+							"const createdId = pm.collectionVariables.get(\"createTaskId\");\r",
+							"\r",
+							"pm.test(\"should receive status code 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"})\r",
+							"\r",
+							"const updatedTask = pm.response.json().find(task => task.id === parseInt(createdId)\r",
+							"    && task.description === updatedDesc\r",
+							"    && task.date === updatedDate);\r",
+							"\r",
+							"pm.test(\"should fetch updated task\", () => {\r",
+							"\r",
+							"    pm.expect(updatedTask).to.be.an('object');\r",
+							"})\r",
+							"\r",
+							"postman.setNextRequest(\"DELETE Delete Task - Wrong id\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}:{{port}}/api/v1/task/all",
+					"host": [
+						"{{base_url}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"v1",
+						"task",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Fetch after delete task",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const deletedId = pm.collectionVariables.get(\"deleteId\");\r",
+							"\r",
+							"pm.test(\"should receive status code 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"})\r",
+							"\r",
+							"const deletedTask = pm.response.json().find(task => task.id === parseInt(deletedId));\r",
+							"console.log(deletedTask);\r",
+							"\r",
+							"pm.test(\"should not show deleted task\", () => {\r",
+							"\r",
+							"    pm.expect(deletedTask).to.equal(undefined);\r",
+							"})\r",
+							"\r",
+							"postman.setNextRequest(null);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}:{{port}}/api/v1/task/all",
+					"host": [
+						"{{base_url}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"v1",
+						"task",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Create a new Task - Well formed body",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const addDays = (date, days) => {\r",
+							"    let result = new Date(date);\r",
+							"    result.setDate(result.getDate() + days);\r",
+							"    return result;\r",
+							"}\r",
+							"\r",
+							"const taskDesc = pm.variables.replaceIn(\"{{$randomVerb}}\") + \" \" + pm.variables.replaceIn(\"{{$randomNoun}}\")\r",
+							"const taskDate = addDays(new Date(), 2).toLocaleDateString(\"fr-CA\");\r",
+							"\r",
+							"pm.collectionVariables.set(\"createTaskDesc\", taskDesc);\r",
+							"pm.collectionVariables.set(\"createTaskDate\", taskDate);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json();\r",
+							"const createdTaskDesc = pm.collectionVariables.get(\"createTaskDesc\");\r",
+							"const createdTaskDate = pm.collectionVariables.get(\"createTaskDate\");\r",
+							"\r",
+							"pm.test(\"should receive status code 201 with body\", () => {\r",
+							"    pm.response.to.have.status(201);\r",
+							"\r",
+							"    pm.expect(response).to.be.an('object');\r",
+							"    pm.expect(response.id).to.be.a('number');\r",
+							"    pm.expect(response.description).to.equal(createdTaskDesc);\r",
+							"    pm.expect(response.date).to.equal(createdTaskDate);\r",
+							"    pm.expect(response.overdue).to.equal(false);\r",
+							"})\r",
+							"\r",
+							"pm.collectionVariables.set(\"createTaskId\", response.id);\r",
+							"\r",
+							"postman.setNextRequest(\"GET Fetch after create new task\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"description\": \"{{createTaskDesc}}\",\r\n    \"date\": \"{{createTaskDate}}\"\r\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}:{{port}}/api/v1/task/create",
+					"host": [
+						"{{base_url}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"v1",
+						"task",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Create a new Task - Illgegal fields",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const addDays = (date, days) => {\r",
+							"    let result = new Date(date);\r",
+							"    result.setDate(result.getDate() + days);\r",
+							"    return result;\r",
+							"}\r",
+							"\r",
+							"const taskDesc = \"\";\r",
+							"const taskDate = addDays(new Date(), -2).toLocaleDateString(\"fr-CA\");\r",
+							"\r",
+							"pm.collectionVariables.set(\"createTaskDesc\", taskDesc);\r",
+							"pm.collectionVariables.set(\"createTaskDate\", taskDate);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json();\r",
+							"\r",
+							"pm.test(\"should return status code 422 with error msgs\", () => {\r",
+							"    pm.response.to.have.status(422);\r",
+							"\r",
+							"    pm.expect(response.errors.includes(\"date must be a date in the present or in the future\")).to.equal(true);\r",
+							"    pm.expect(response.errors.includes(\"description must not be blank\")).to.equal(true);\r",
+							"})\r",
+							"\r",
+							"postman.setNextRequest(\"POST Create a new Task - Well formed body\");\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"description\": \"{{createTaskDesc}}\",\r\n    \"date\": \"{{createTaskDate}}\"\r\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}:{{port}}/api/v1/task/create",
+					"host": [
+						"{{base_url}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"v1",
+						"task",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT Update Task - Illegal fields",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const addDays = (date, days) => {\r",
+							"    let result = new Date(date);\r",
+							"    result.setDate(result.getDate() + days);\r",
+							"    return result;\r",
+							"}\r",
+							"\r",
+							"const taskDesc = \"\";\r",
+							"const taskDate = addDays(new Date(), -2).toLocaleDateString(\"fr-CA\");\r",
+							"\r",
+							"pm.collectionVariables.set(\"updateTaskDesc\", taskDesc);\r",
+							"pm.collectionVariables.set(\"updateTaskDate\", taskDate);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json();\r",
+							"\r",
+							"pm.test(\"should return status code 422 with error msgs\", () => {\r",
+							"    pm.response.to.have.status(422);\r",
+							"\r",
+							"    pm.expect(response.errors.includes(\"date must be a date in the present or in the future\")).to.equal(true);\r",
+							"    pm.expect(response.errors.includes(\"description must not be blank\")).to.equal(true);\r",
+							"})\r",
+							"\r",
+							"postman.setNextRequest(\"PUT Update Task - Wrong id\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": {{createTaskId}},\r\n    \"description\": \"{{updateTaskDesc}}\",\r\n    \"date\": \"{{updateTaskDate}}\"\r\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}:{{port}}/api/v1/task/update",
+					"host": [
+						"{{base_url}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"v1",
+						"task",
+						"update"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT Update Task - Well formed body",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const addDays = (date, days) => {\r",
+							"    let result = new Date(date);\r",
+							"    result.setDate(result.getDate() + days);\r",
+							"    return result;\r",
+							"}\r",
+							"\r",
+							"const taskDesc = pm.variables.replaceIn(\"{{$randomVerb}}\") + \" \" + pm.variables.replaceIn(\"{{$randomNoun}}\")\r",
+							"const taskDate = addDays(new Date(), 2).toLocaleDateString(\"fr-CA\");\r",
+							"\r",
+							"\r",
+							"pm.collectionVariables.set(\"updateTaskDesc\", taskDesc);\r",
+							"pm.collectionVariables.set(\"updateTaskDate\", taskDate);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json();\r",
+							"const updatedTaskDesc = pm.collectionVariables.get(\"updateTaskDesc\");\r",
+							"const updatedTaskDate = pm.collectionVariables.get(\"updateTaskDate\");\r",
+							"\r",
+							"pm.test(\"should receive status code 200 with body\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"\r",
+							"    pm.expect(response).to.be.an('object');\r",
+							"    pm.expect(response.id).to.be.a('number');\r",
+							"    pm.expect(response.description).to.equal(updatedTaskDesc);\r",
+							"    pm.expect(response.date).to.equal(updatedTaskDate);\r",
+							"    pm.expect(response.overdue).to.equal(false);\r",
+							"})\r",
+							"\r",
+							"postman.setNextRequest(\"GET Fetch after update task\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": {{createTaskId}},\r\n    \"description\": \"{{updateTaskDesc}}\",\r\n    \"date\": \"{{updateTaskDate}}\"\r\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}:{{port}}/api/v1/task/update",
+					"host": [
+						"{{base_url}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"v1",
+						"task",
+						"update"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT Update Task - Wrong id",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const addDays = (date, days) => {\r",
+							"    let result = new Date(date);\r",
+							"    result.setDate(result.getDate() + days);\r",
+							"    return result;\r",
+							"}\r",
+							"\r",
+							"const taskDesc = pm.variables.replaceIn(\"{{$randomVerb}}\") + \" \" + pm.variables.replaceIn(\"{{$randomNoun}}\")\r",
+							"const taskDate = addDays(new Date(), 2).toLocaleDateString(\"fr-CA\");\r",
+							"\r",
+							"const wrongTaskId = 0;\r",
+							"\r",
+							"pm.collectionVariables.set(\"updateTaskDesc\", taskDesc);\r",
+							"pm.collectionVariables.set(\"updateTaskDate\", taskDate);\r",
+							"pm.collectionVariables.set(\"wrongId\", wrongTaskId);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"should return status code 404\", () => {\r",
+							"    pm.response.to.have.status(404);\r",
+							"})\r",
+							"\r",
+							"postman.setNextRequest(\"PUT Update Task - Well formed body\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": {{wrongId}},\r\n    \"description\": \"{{updateTaskDesc}}\",\r\n    \"date\": \"{{updateTaskDate}}\"\r\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}:{{port}}/api/v1/task/update",
+					"host": [
+						"{{base_url}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"v1",
+						"task",
+						"update"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE Delete Task - Wrong id",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const createdId = parseInt(pm.collectionVariables.get(\"createTaskId\"));\r",
+							"const wrongId = createdId + 1;\r",
+							"\r",
+							"pm.collectionVariables.set(\"deleteId\", wrongId);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"should return status code 404\", () => {\r",
+							"    pm.response.to.have.status(404);\r",
+							"})\r",
+							"\r",
+							"postman.setNextRequest(\"DELETE Delete Task - Correct id\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}:{{port}}/api/v1/task/{{deleteId}}/delete",
+					"host": [
+						"{{base_url}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"v1",
+						"task",
+						"{{deleteId}}",
+						"delete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE Delete Task - Correct id",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const createdId = parseInt(pm.collectionVariables.get(\"createTaskId\"));\r",
+							"\r",
+							"pm.collectionVariables.set(\"deleteId\", createdId);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"should return status code 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"})\r",
+							"\r",
+							"postman.setNextRequest(\"GET Fetch after delete task\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}:{{port}}/api/v1/task/{{deleteId}}/delete",
+					"host": [
+						"{{base_url}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"v1",
+						"task",
+						"{{deleteId}}",
+						"delete"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "createTaskDesc",
+			"value": ""
+		},
+		{
+			"key": "createTaskDate",
+			"value": ""
+		},
+		{
+			"key": "createTaskId",
+			"value": ""
+		},
+		{
+			"key": "updateTaskDesc",
+			"value": ""
+		},
+		{
+			"key": "updateTaskDate",
+			"value": ""
+		},
+		{
+			"key": "wrongId",
+			"value": ""
+		},
+		{
+			"key": "deleteId",
+			"value": ""
+		}
+	]
+}

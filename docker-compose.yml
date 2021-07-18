@@ -11,8 +11,7 @@ services:
             - db-data:/var/lib/mysql
         container_name: mysql1
     web:
-        image: task-manager:1.0
-        build: ./task-manager
+        image: syd.ocir.io/sdvw2vh5qake/task-manager/service:1.0
         ports:
             - "8080:8080"
         restart: always
@@ -21,14 +20,13 @@ services:
         depends_on:
             - "db"
         container_name: task-service
-    # client:
-    #     image: task-manager-client:1.0
-    #     build: ./task-manager-client
-    #     ports:
-    #         - "80:80"
-    #     restart: always
-    #     depends_on:
-    #         - "web"
-    #     container_name: task-client
+    client:
+        image: syd.ocir.io/sdvw2vh5qake/task-manager/client:1.0
+        ports:
+            - "80:80"
+        restart: always
+        depends_on:
+            - "web"
+        container_name: task-client
 volumes:
     db-data:
