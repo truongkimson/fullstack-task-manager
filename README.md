@@ -10,6 +10,6 @@ The application can be accessed by this [link](http://140.238.194.85/ "Task mana
 
 Full documentation can be found [here](https://truongkimson.github.io/task-manager-docs/)
 
-## REST Endpoint tesing
+## REST Endpoint testing
 
 Testing report can be found in `rest-endpoint-test/newman` directory
